@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.0.44",
+		"generator":"Khronos glTF Blender I/O v4.1.63",
 		"version":"2.0"
 	},
 	"scene":0,
@@ -21,7 +21,7 @@
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"Bark_DeadTree",
+			"name":"Bark_DeadTree.001",
 			"normalTexture":{
 				"index":0
 			},
@@ -39,10 +39,10 @@
 			"primitives":[
 				{
 					"attributes":{
-						"COLOR_0":0,
-						"POSITION":1,
-						"NORMAL":2,
-						"TEXCOORD_0":3
+						"POSITION":0,
+						"NORMAL":1,
+						"TEXCOORD_0":2,
+						"COLOR_0":3
 					},
 					"indices":4,
 					"material":0
@@ -76,36 +76,36 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":8036,
-			"type":"VEC4"
+			"count":9220,
+			"max":[
+				2.5923237800598145,
+				9.15992259979248,
+				2.9034998416900635
+			],
+			"min":[
+				-3.556612253189087,
+				-0.3355545997619629,
+				-2.845168113708496
+			],
+			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":8036,
-			"max":[
-				3.556612253189087,
-				9.15992259979248,
-				2.845168113708496
-			],
-			"min":[
-				-2.5923237800598145,
-				-0.3355545997619629,
-				-2.9034998416900635
-			],
+			"count":9220,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":8036,
-			"type":"VEC3"
+			"count":9220,
+			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5126,
-			"count":8036,
-			"type":"VEC2"
+			"count":9220,
+			"type":"VEC3"
 		},
 		{
 			"bufferView":4,
@@ -117,32 +117,32 @@
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":128576,
+			"byteLength":110640,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":96432,
-			"byteOffset":128576,
+			"byteLength":110640,
+			"byteOffset":110640,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":96432,
-			"byteOffset":225008,
+			"byteLength":73760,
+			"byteOffset":221280,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":64288,
-			"byteOffset":321440,
+			"byteLength":110640,
+			"byteOffset":295040,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":37014,
-			"byteOffset":385728,
+			"byteOffset":405680,
 			"target":34963
 		}
 	],
@@ -154,7 +154,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":422744,
+			"byteLength":442696,
 			"uri":"DeadTree_1.bin"
 		}
 	]

@@ -21,10 +21,6 @@ def _enum_assets(_, __):
     return items or [("", "<empty>", "")]
 
 # ------------------------ 基本オペレータ ------------------------
-    
-def ensure_obj_import_enabled():
-    # アドオンが無効なら有効化
-    addon_utils.enable("io_scene_obj", default_set=True, persistent=True)
 
 class MYADDON_OT_add_asset(bpy.types.Operator):
     """assets フォルダーからアセットをインポート"""
@@ -53,7 +49,7 @@ class MYADDON_OT_add_asset(bpy.types.Operator):
                 up_axis='Y')
         elif ext in {".gltf", ".glb"}:
             addon_utils.enable("io_scene_gltf2", default_set=True, persistent=True)
-            bpy.ops.import_scene.gltf(filepath=obj_path)   # 4.1 でもこの ID です
+            bpy.ops.import_scene.gltf(filepath=obj_path)
         else:
             self.report({'ERROR'}, f"Unsupported: {ext}")
             return {'CANCELLED'}
@@ -67,6 +63,9 @@ class MYADDON_OT_add_asset(bpy.types.Operator):
                 obj.rotation_mode = 'XYZ'
                 obj["tag_name"]  = "FieldObject"
                 obj["file_name"] = self.asset_name
+                obj['collider'] = obj.get('collider', 'Box')
+                obj['collider_center'] = mathutils.Vector((0,0,0))
+                obj['collider_size'] = mathutils.Vector((2,2,2))
 
         return {'FINISHED'}
 
@@ -132,15 +131,22 @@ class MYADDON_OT_export_scene(bpy.types.Operator, bpy_extras.io_utils.ExportHelp
         if 'collider' in obj:
             col = {'type': obj['collider']}
             center = tuple(obj.get('collider_center', (0,0,0)))
+            col['center'] = center
 
+            sx, sy, sz = obj.matrix_local.to_scale()
             if col['type'] == 'Sphere':
-                col['radius'] = obj.get('collider_radius', 1.0)
-                col['center'] = center
+                r = obj.get('collider_radius', 1.0)
+                col['radius'] = r * max(sx, sy, sz)
             else:
                 size = tuple(obj.get('collider_size', (2,2,2)))
                 size_scaled = tuple(v * 0.5 for v in size)
-                col['size'] = size_scaled
-                col['center'] = center
+                size = obj.get('collider_size', (2, 2, 2))
+                # Half-extent にして、各軸のスケールを掛ける
+                col['size'] = (
+                    size[0] * sx * 0.5,
+                    size[1] * sy * 0.5,
+                    size[2] * sz * 0.5,
+                )
             node['collider'] = col
 
         if obj.children:
@@ -183,6 +189,54 @@ class MYADDON_OT_add_collider(bpy.types.Operator):
             obj['collider_size'] = mathutils.Vector((2,2,2))
         return {'FINISHED'}
 
+class MYADDON_OT_refresh_colliders(bpy.types.Operator):
+    bl_idname = "myaddon.refresh_colliders"
+    bl_label  = "リスト更新"
+    bl_options = {'REGISTER','UNDO'}
+
+    def execute(self, ctx):
+        col = ctx.scene.coll_list
+        col.clear()
+        active = ctx.view_layer.objects.active
+        if not active:
+            self.report({'WARNING'}, "アクティブなオブジェクトがありません")
+            return {'CANCELLED'}
+
+        key = active.get("file_name", active.data.name)
+        for obj in bpy.data.objects:
+            if ('collider' in obj and
+                obj.get("file_name", obj.data.name) == key):
+                item = col.add()
+                item.name = obj.name
+        return {'FINISHED'}
+
+
+class MYADDON_OT_copy_collider_to_same(bpy.types.Operator):
+    """編集中インスタンスの collider 値を同アセットの全インスタンスへコピー"""
+    bl_idname = "myaddon.copy_collider_to_same"
+    bl_label  = "Apply to Same Asset"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, ctx):
+        col = ctx.scene.coll_list
+        if not col or ctx.scene.coll_index < 0:
+            self.report({'WARNING'}, "リストが空です")
+            return {'CANCELLED'}
+
+        src = bpy.data.objects[col[ctx.scene.coll_index].name]
+        key = src.get("file_name", src.data.name)
+        for obj in bpy.data.objects:
+            if obj is src:
+                continue
+            if obj.get("file_name", obj.data.name) != key:
+                continue
+            for k in ('collider', 'collider_center', 'collider_size', 'collider_radius'):
+                if k in src:
+                    obj[k] = src[k]
+
+            collider_enum_sync(obj)
+        return {'FINISHED'}
+
 # ------------------------ Register Helper ------------------------
 
 _classes = (
@@ -191,6 +245,8 @@ _classes = (
     MYADDON_OT_add_tagname,
     MYADDON_OT_add_collider,
     MYADDON_OT_add_asset,
+    MYADDON_OT_refresh_colliders,
+    MYADDON_OT_copy_collider_to_same,
 )
 
 def register():

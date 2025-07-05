@@ -25,9 +25,10 @@ class DrawCollider:
                 for off in offsets:
                     p = center + mathutils.Vector((
                         off[0]*size[0], off[1]*size[1], off[2]*size[2]))
-                    loc, rot, _ = obj.matrix_world.decompose()
-                    mat = rot.to_matrix().to_4x4()
-                    mat.translation = loc
+                    #loc, rot, _ = obj.matrix_world.decompose()
+                    #mat = rot.to_matrix().to_4x4()
+                    #mat.translation = loc
+                    mat = obj.matrix_world
                     p = mat @ p
                     vertices['pos'].append(p)
                 # 12 辺

@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.0.44",
+		"generator":"Khronos glTF Blender I/O v4.1.63",
 		"version":"2.0"
 	},
 	"scene":0,
@@ -39,10 +39,10 @@
 			"primitives":[
 				{
 					"attributes":{
-						"COLOR_0":0,
-						"POSITION":1,
-						"NORMAL":2,
-						"TEXCOORD_0":3
+						"POSITION":0,
+						"NORMAL":1,
+						"TEXCOORD_0":2,
+						"COLOR_0":3
 					},
 					"indices":4,
 					"material":0
@@ -76,36 +76,36 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":7499,
-			"type":"VEC4"
+			"count":8474,
+			"max":[
+				3.9705331325531006,
+				16.10182762145996,
+				4.7972307205200195
+			],
+			"min":[
+				-4.385861396789551,
+				-0.3355545997619629,
+				-3.616036891937256
+			],
+			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":7499,
-			"max":[
-				4.385861396789551,
-				16.10182762145996,
-				3.616036891937256
-			],
-			"min":[
-				-3.9705328941345215,
-				-0.3355545997619629,
-				-4.7972307205200195
-			],
+			"count":8474,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":7499,
-			"type":"VEC3"
+			"count":8474,
+			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5126,
-			"count":7499,
-			"type":"VEC2"
+			"count":8474,
+			"type":"VEC3"
 		},
 		{
 			"bufferView":4,
@@ -117,32 +117,32 @@
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":119984,
+			"byteLength":101688,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":89988,
-			"byteOffset":119984,
+			"byteLength":101688,
+			"byteOffset":101688,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":89988,
-			"byteOffset":209972,
+			"byteLength":67792,
+			"byteOffset":203376,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":59992,
-			"byteOffset":299960,
+			"byteLength":101688,
+			"byteOffset":271168,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":33888,
-			"byteOffset":359952,
+			"byteOffset":372856,
 			"target":34963
 		}
 	],
@@ -154,7 +154,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":393840,
+			"byteLength":406744,
 			"uri":"DeadTree_5.bin"
 		}
 	]
