@@ -7,46 +7,66 @@ def _write_and_print(file, line):
     print(line)
     file.write(line + '\n')
 
+# ------------------------ ファイル読み込み ------------------------
+
+ASSET_DIR = os.path.join(os.path.dirname(__file__), "assets")
+EXT_OK    = (".obj", ".gltf", ".glb")
+
+def _enum_assets(_, __):
+    items = []
+    for fname in sorted(os.listdir(ASSET_DIR)):
+        if fname.lower().endswith(EXT_OK):
+            label = os.path.splitext(fname)[0]
+            items.append((fname, label, ""))
+    return items or [("", "<empty>", "")]
+
 # ------------------------ 基本オペレータ ------------------------
     
 def ensure_obj_import_enabled():
     # アドオンが無効なら有効化
     addon_utils.enable("io_scene_obj", default_set=True, persistent=True)
 
-class MYADDON_OT_add_tower_windmill(bpy.types.Operator):
-    """TowerWindmill.obj をシーンインポート"""
-    bl_idname = 'myaddon.add_tower_windmill'
-    bl_label = '風車を生成'
+class MYADDON_OT_add_asset(bpy.types.Operator):
+    """assets フォルダーからアセットをインポート"""
+    bl_idname = 'myaddon.add_asset'
+    bl_label = 'FiledObjectを生成'
     bl_options = {'REGISTER', 'UNDO'}
 
+    # ここが選択用プロパティ
+    asset_name: bpy.props.EnumProperty(name="Asset",description="インポートする OBJ",items=_enum_assets)
+
     def execute(self, context):
-        import os
-        ensure_obj_import_enabled()
-        obj_path = os.path.join(os.path.dirname(__file__), "assets/", "TowerWindmill.obj")
-
+        # パスを生成
+        obj_path = os.path.join(ASSET_DIR, self.asset_name)
         if not os.path.exists(obj_path):
-            self.report({'ERROR'}, f"OBJ not found: {obj_path}")
+            self.report({'ERROR'}, f"Not found: {obj_path}")
             return {'CANCELLED'}
-        
-        before = set(bpy.context.scene.objects)
 
-        # 既定の OBJ インポートオペレータを呼び出す
-        if hasattr(bpy.ops.wm, "obj_import"):
+        ext = os.path.splitext(obj_path)[1].lower()
+
+        # インポートを実行
+        if ext == ".obj":
+            addon_utils.enable("io_scene_obj", default_set=True, persistent=True)
             bpy.ops.wm.obj_import(
                 filepath=obj_path,
-                forward_axis='Z',
-                up_axis='Y',
-            )
+                forward_axis='NEGATIVE_Z',
+                up_axis='Y')
+        elif ext in {".gltf", ".glb"}:
+            addon_utils.enable("io_scene_gltf2", default_set=True, persistent=True)
+            bpy.ops.import_scene.gltf(filepath=obj_path)   # 4.1 でもこの ID です
+        else:
+            self.report({'ERROR'}, f"Unsupported: {ext}")
+            return {'CANCELLED'}
 
-        # 生成した風車のObjectの回転を無くす
+        # 回転とカスタムプロパティを初期化
         imported = context.selected_objects
         if imported:
             context.view_layer.objects.active = imported[0]
             bpy.ops.object.transform_apply(rotation=True)
             for obj in imported:
-                # すでに別の値があれば上書きしない
-                obj["tag_name"] = "FieldObject"
-                obj["file_name"] = os.path.basename(obj_path)
+                obj.rotation_mode = 'XYZ'
+                obj["tag_name"]  = "FieldObject"
+                obj["file_name"] = self.asset_name
 
         return {'FINISHED'}
 
@@ -111,12 +131,16 @@ class MYADDON_OT_export_scene(bpy.types.Operator, bpy_extras.io_utils.ExportHelp
 
         if 'collider' in obj:
             col = {'type': obj['collider']}
+            center = tuple(obj.get('collider_center', (0,0,0)))
+
             if col['type'] == 'Sphere':
                 col['radius'] = obj.get('collider_radius', 1.0)
-                col['center'] = obj.get('collider_center', (0,0,0))
+                col['center'] = center
             else:
-                col['size'] = obj.get('collider_size', (2,2,2))
-                col['center'] = obj.get('collider_center', (0,0,0))
+                size = tuple(obj.get('collider_size', (2,2,2)))
+                size_scaled = tuple(v * 0.5 for v in size)
+                col['size'] = size_scaled
+                col['center'] = center
             node['collider'] = col
 
         if obj.children:
@@ -166,7 +190,7 @@ _classes = (
     MYADDON_OT_add_filename,
     MYADDON_OT_add_tagname,
     MYADDON_OT_add_collider,
-    MYADDON_OT_add_tower_windmill,
+    MYADDON_OT_add_asset,
 )
 
 def register():

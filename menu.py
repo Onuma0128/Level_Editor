@@ -1,7 +1,7 @@
 import bpy
 from .operators import (
     MYADDON_OT_export_scene,
-    MYADDON_OT_add_tower_windmill,
+    MYADDON_OT_add_asset,
 )
 
 class TOPBAR_MT_my_menu(bpy.types.Menu):
@@ -11,7 +11,7 @@ class TOPBAR_MT_my_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator('wm.url_open_preset', text='Manual', icon='HELP')
-        layout.operator(MYADDON_OT_add_tower_windmill.bl_idname, text=MYADDON_OT_add_tower_windmill.bl_label)
+        layout.operator_menu_enum(MYADDON_OT_add_asset.bl_idname,"asset_name", text=MYADDON_OT_add_asset.bl_label)
         layout.separator()
         layout.operator(MYADDON_OT_export_scene.bl_idname, text=MYADDON_OT_export_scene.bl_label)
 
