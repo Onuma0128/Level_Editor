@@ -1,8 +1,7 @@
 import bpy
 from .operators import (
-    MYADDON_OT_stretch_vertex,
-    MYADDON_OT_create_ico_sphere,
-    MYADDON_OT_export_scene
+    MYADDON_OT_export_scene,
+    MYADDON_OT_add_tower_windmill,
 )
 
 class TOPBAR_MT_my_menu(bpy.types.Menu):
@@ -12,8 +11,8 @@ class TOPBAR_MT_my_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator('wm.url_open_preset', text='Manual', icon='HELP')
-        layout.operator(MYADDON_OT_stretch_vertex.bl_idname, text=MYADDON_OT_stretch_vertex.bl_label)
-        layout.operator(MYADDON_OT_create_ico_sphere.bl_idname, text=MYADDON_OT_create_ico_sphere.bl_label)
+        layout.operator(MYADDON_OT_add_tower_windmill.bl_idname, text=MYADDON_OT_add_tower_windmill.bl_label)
+        layout.separator()
         layout.operator(MYADDON_OT_export_scene.bl_idname, text=MYADDON_OT_export_scene.bl_label)
 
     @classmethod

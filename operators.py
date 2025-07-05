@@ -1,5 +1,5 @@
-import bpy, json, math, mathutils, copy
-import bpy_extras
+import bpy, json, math, mathutils, copy, os
+import bpy_extras,addon_utils
 
 # ------------------------ 汎用ヘルパ ------------------------
 
@@ -8,23 +8,46 @@ def _write_and_print(file, line):
     file.write(line + '\n')
 
 # ------------------------ 基本オペレータ ------------------------
+    
+def ensure_obj_import_enabled():
+    # アドオンが無効なら有効化
+    addon_utils.enable("io_scene_obj", default_set=True, persistent=True)
 
-class MYADDON_OT_stretch_vertex(bpy.types.Operator):
-    bl_idname = 'myaddon.stretch_vertex'
-    bl_label = '頂点を伸ばす'
+class MYADDON_OT_add_tower_windmill(bpy.types.Operator):
+    """TowerWindmill.obj をシーンインポート"""
+    bl_idname = 'myaddon.add_tower_windmill'
+    bl_label = '風車を生成'
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        bpy.data.objects['Cube'].data.vertices[0].co.x += 1.0
-        return {'FINISHED'}
+        import os
+        ensure_obj_import_enabled()
+        obj_path = os.path.join(os.path.dirname(__file__), "assets/", "TowerWindmill.obj")
 
-class MYADDON_OT_create_ico_sphere(bpy.types.Operator):
-    bl_idname = 'myaddon.create_ico_sphere'
-    bl_label = 'ICO球生成'
-    bl_options = {'REGISTER', 'UNDO'}
+        if not os.path.exists(obj_path):
+            self.report({'ERROR'}, f"OBJ not found: {obj_path}")
+            return {'CANCELLED'}
+        
+        before = set(bpy.context.scene.objects)
 
-    def execute(self, context):
-        bpy.ops.mesh.primitive_ico_sphere_add()
+        # 既定の OBJ インポートオペレータを呼び出す
+        if hasattr(bpy.ops.wm, "obj_import"):
+            bpy.ops.wm.obj_import(
+                filepath=obj_path,
+                forward_axis='Z',
+                up_axis='Y',
+            )
+
+        # 生成した風車のObjectの回転を無くす
+        imported = context.selected_objects
+        if imported:
+            context.view_layer.objects.active = imported[0]
+            bpy.ops.object.transform_apply(rotation=True)
+            for obj in imported:
+                # すでに別の値があれば上書きしない
+                obj["tag_name"] = "FieldObject"
+                obj["file_name"] = os.path.basename(obj_path)
+
         return {'FINISHED'}
 
 # ------------------------ シーン Export ------------------------
@@ -139,12 +162,11 @@ class MYADDON_OT_add_collider(bpy.types.Operator):
 # ------------------------ Register Helper ------------------------
 
 _classes = (
-    MYADDON_OT_stretch_vertex,
-    MYADDON_OT_create_ico_sphere,
     MYADDON_OT_export_scene,
     MYADDON_OT_add_filename,
     MYADDON_OT_add_tagname,
     MYADDON_OT_add_collider,
+    MYADDON_OT_add_tower_windmill,
 )
 
 def register():

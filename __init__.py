@@ -15,10 +15,13 @@ from . import properties, operators, panels, draw_collider, menu
 
 # 再読み込み時にキャッシュをクリア
 modules = [properties, operators, panels, draw_collider, menu]
-for m in modules:
-    importlib.reload(m)
+def _reload_modules():
+    global modules
+    # いったん全部 reload して、リストも最新のモジュール参照に差し替える
+    modules = [importlib.reload(m) for m in modules]
 
 def register():
+    _reload_modules()
     for m in modules:
         m.register()
     print("レベルエディタ (分割版) が有効化されました。")
