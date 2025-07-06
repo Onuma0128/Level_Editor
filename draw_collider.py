@@ -53,9 +53,10 @@ class DrawCollider:
                         p0[b] += math.sin(t0)*r
                         p1[a] += math.cos(t1)*r
                         p1[b] += math.sin(t1)*r
-                        loc, rot, _ = obj.matrix_world.decompose()
-                        mat = rot.to_matrix().to_4x4()
-                        mat.translation = loc
+                        #loc, rot, _ = obj.matrix_world.decompose()
+                        #mat = rot.to_matrix().to_4x4()
+                        #mat.translation = loc
+                        mat = obj.matrix_world
                         p0 = mat @ p0
                         p1 = mat @ p1
                         vertices['pos'].extend([p0,p1])

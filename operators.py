@@ -1,5 +1,6 @@
 import bpy, json, math, mathutils, copy, os
 import bpy_extras,addon_utils
+from .properties import collider_enum_sync
 
 # ------------------------ 汎用ヘルパ ------------------------
 
@@ -39,6 +40,7 @@ class MYADDON_OT_add_asset(bpy.types.Operator):
             return {'CANCELLED'}
 
         ext = os.path.splitext(obj_path)[1].lower()
+        basename = os.path.splitext(self.asset_name)[0]
 
         # インポートを実行
         if ext == ".obj":
@@ -61,7 +63,13 @@ class MYADDON_OT_add_asset(bpy.types.Operator):
             bpy.ops.object.transform_apply(rotation=True)
             for obj in imported:
                 obj.rotation_mode = 'XYZ'
-                obj["tag_name"]  = "FieldObject"
+                obj["group_name"] ="FieldObject"
+                if basename.startswith("DeadTree"):
+                    obj["tag_name"] = "DeadTree"
+                elif basename == "BigBarn" or basename == "OpenBarn" or basename == "TowerWindmill" or basename == "Well":
+                    obj["tag_name"] = "Building"
+                else:
+                    obj["tag_name"] = basename
                 obj["file_name"] = self.asset_name
                 obj['collider'] = obj.get('collider', 'Box')
                 obj['collider_center'] = mathutils.Vector((0,0,0))
@@ -127,6 +135,8 @@ class MYADDON_OT_export_scene(bpy.types.Operator, bpy_extras.io_utils.ExportHelp
             node['file_name'] = obj['file_name']
         if 'tag_name' in obj:
             node['tag_name'] = obj['tag_name']
+        if 'group_name' in obj:
+            node['group_name'] = obj['group_name']
 
         if 'collider' in obj:
             col = {'type': obj['collider']}
@@ -163,6 +173,15 @@ class MYADDON_OT_add_filename(bpy.types.Operator):
 
     def execute(self, context):
         context.object['file_name'] = ''
+        return {'FINISHED'}
+
+class MYADDON_OT_add_groupname(bpy.types.Operator):
+    bl_idname = 'myaddon.add_groupname'
+    bl_label = 'GroupName 追加'
+    bl_options = {'REGISTER','UNDO'}
+
+    def execute(self, context):
+        context.object['group_name'] = ''
         return {'FINISHED'}
 
 class MYADDON_OT_add_tagname(bpy.types.Operator):
@@ -242,6 +261,7 @@ class MYADDON_OT_copy_collider_to_same(bpy.types.Operator):
 _classes = (
     MYADDON_OT_export_scene,
     MYADDON_OT_add_filename,
+    MYADDON_OT_add_groupname,
     MYADDON_OT_add_tagname,
     MYADDON_OT_add_collider,
     MYADDON_OT_add_asset,

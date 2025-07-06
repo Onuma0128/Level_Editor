@@ -14,6 +14,20 @@ class OBJECT_PT_file_name(bpy.types.Panel):
         else:
             layout.operator('myaddon.add_filename')
 
+class OBJECT_PT_group_name(bpy.types.Panel):
+    bl_idname = 'OBJECT_PT_group_name'
+    bl_label = 'GroupName'
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = 'object'
+
+    def draw(self, context):
+        layout = self.layout
+        if 'group_name' in context.object:
+            layout.prop(context.object, '["group_name"]', text='GroupName')
+        else:
+            layout.operator('myaddon.add_groupname')
+
 class OBJECT_PT_tag_name(bpy.types.Panel):
     bl_idname = 'OBJECT_PT_tag_name'
     bl_label = 'TagName'
@@ -89,6 +103,7 @@ class MYADDON_UL_collider_objs(bpy.types.UIList):
 
 _classes = (
     OBJECT_PT_file_name,
+    OBJECT_PT_group_name,
     OBJECT_PT_tag_name,
     OBJECT_PT_collider,
     MYADDON_UL_collider_objs,
