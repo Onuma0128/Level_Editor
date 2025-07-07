@@ -98,6 +98,16 @@ def register():
         default='Box',
         update=_collider_enum_update
     )
+    bpy.types.Object.collider_enable = bpy.props.BoolProperty(
+        name = 'Enable',
+        description = 'Enable collider drawing and export',
+        default = True
+    )
+    bpy.types.Object.enable_from_export = bpy.props.BoolProperty(
+        name = 'Enable',
+        description='このオブジェクトをエクスポートするか',
+        default = True
+    )
     bpy.types.Scene.coll_list = bpy.props.CollectionProperty(type=bpy.types.PropertyGroup)
     bpy.types.Scene.coll_index = bpy.props.IntProperty(update=_on_coll_index_update)
     bpy.app.handlers.depsgraph_update_post.append(_sync_list_from_selection)

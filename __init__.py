@@ -1,4 +1,4 @@
-import importlib
+import importlib,bpy
 
 # Blender アドオン情報
 bl_info = {
@@ -25,6 +25,7 @@ def register():
     for m in modules:
         m.register()
     print("レベルエディタ (分割版) が有効化されました。")
+
 
 def unregister():
     for m in reversed(modules):

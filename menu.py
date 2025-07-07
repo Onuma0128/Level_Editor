@@ -22,10 +22,18 @@ class TOPBAR_MT_my_menu(bpy.types.Menu):
 def draw_in_topbar(self, context):
     self.layout.menu(TOPBAR_MT_my_menu.bl_idname)
 
+_registered_draw_func = False
+
 def register():
     bpy.utils.register_class(TOPBAR_MT_my_menu)
-    bpy.types.TOPBAR_MT_editor_menus.append(draw_in_topbar)
+    global _registered_draw_func
+    if not _registered_draw_func:
+        bpy.types.TOPBAR_MT_editor_menus.append(draw_in_topbar)
+        _registered_draw_func = True
 
 def unregister():
-    bpy.types.TOPBAR_MT_editor_menus.remove(draw_in_topbar)
+    global _registered_draw_func
+    if _registered_draw_func:
+        bpy.types.TOPBAR_MT_editor_menus.remove(draw_in_topbar)
+        _registered_draw_func = False
     bpy.utils.unregister_class(TOPBAR_MT_my_menu)

@@ -15,7 +15,7 @@ class DrawCollider:
         ]
 
         for obj in bpy.context.scene.objects:
-            if 'collider' not in obj:
+            if 'collider' not in obj or not obj.get('collider_enable', True):
                 continue
             center = mathutils.Vector(obj['collider_center'])
 

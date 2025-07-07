@@ -74,6 +74,7 @@ class MYADDON_OT_add_asset(bpy.types.Operator):
                 obj['collider'] = obj.get('collider', 'Box')
                 obj['collider_center'] = mathutils.Vector((0,0,0))
                 obj['collider_size'] = mathutils.Vector((2,2,2))
+                obj['collider_enable'] = True
 
         return {'FINISHED'}
 
@@ -111,6 +112,8 @@ class MYADDON_OT_export_scene(bpy.types.Operator, bpy_extras.io_utils.ExportHelp
         for obj in bpy.context.scene.objects:
             if obj.parent:
                 continue
+            if not obj.get("enable_from_export", True):
+                continue
             self._parse_recursive_json(root['objects'], obj)
 
         with open(self.filepath, 'wt', encoding='utf-8') as f:
@@ -138,7 +141,7 @@ class MYADDON_OT_export_scene(bpy.types.Operator, bpy_extras.io_utils.ExportHelp
         if 'group_name' in obj:
             node['group_name'] = obj['group_name']
 
-        if 'collider' in obj:
+        if 'collider' in obj and obj.get('collider_enable',True):
             col = {'type': obj['collider']}
             center = tuple(obj.get('collider_center', (0,0,0)))
             col['center'] = center
@@ -206,6 +209,7 @@ class MYADDON_OT_add_collider(bpy.types.Operator):
             obj['collider_radius'] = 1.0
         else:
             obj['collider_size'] = mathutils.Vector((2,2,2))
+        obj['collider_enable'] = True
         return {'FINISHED'}
 
 class MYADDON_OT_refresh_colliders(bpy.types.Operator):

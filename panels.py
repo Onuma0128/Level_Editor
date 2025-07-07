@@ -42,6 +42,28 @@ class OBJECT_PT_tag_name(bpy.types.Panel):
         else:
             layout.operator('myaddon.add_tagname')
 
+class VIEW3D_PT_export_settings(bpy.types.Panel):
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Item'
+    bl_label = 'Export Settings'
+
+    def draw(self, context):
+        layout = self.layout
+        obj = context.object
+
+        if not obj:
+            layout.label(text="オブジェクト未選択")
+            return
+
+        layout.prop(obj, 'enable_from_export', text="Enable")
+
+        if not obj.get('enable_from_export', True):
+            obj.color[3] = 1.0
+        else:
+            obj.color[3] = 0.2
+
+
 class OBJECT_PT_collider(bpy.types.Panel):
     bl_idname = 'OBJECT_PT_collider'
     bl_label = 'Collider'
@@ -54,6 +76,7 @@ class OBJECT_PT_collider(bpy.types.Panel):
         obj = context.object
         if 'collider' in obj:
             layout.prop(obj, 'collider_enum', text='Type')
+            layout.prop(obj, 'collider_enable', text='Enable')
             layout.prop(obj, '["collider_center"]', text='Center')
             if obj.collider_enum == 'Sphere':
                 layout.prop(obj, '["collider_radius"]', text='Radius')
@@ -84,6 +107,7 @@ class VIEW3D_PT_collider_editor(bpy.types.Panel):
             obj = bpy.data.objects[scn.coll_list[scn.coll_index].name]
             box = layout.box()
             box.prop(obj, "collider_enum", text="Type")
+            box.prop(obj, "collider_enable", text="Enable")
             box.prop(obj, '["collider_center"]', text="Center")
             if obj.collider_enum == 'Sphere':
                 box.prop(obj, '["collider_radius"]', text="Radius")
@@ -108,6 +132,7 @@ _classes = (
     OBJECT_PT_collider,
     MYADDON_UL_collider_objs,
     VIEW3D_PT_collider_editor,
+    VIEW3D_PT_export_settings,
 )
 
 def register():
